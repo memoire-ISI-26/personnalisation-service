@@ -7,10 +7,13 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import org.springframework.cache.annotation.EnableCaching;
 
+import org.springframework.scheduling.annotation.EnableScheduling;
+
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
 @EnableCaching
+@EnableScheduling
 public class PersonnalisationServiceApplication {
 
 	public static void main(String[] args) {
