@@ -19,10 +19,16 @@ public class SparkBatchScheduler {
 
         try {
             // Commande spark-submit
-            ProcessBuilder pb = new ProcessBuilder(
+            /*ProcessBuilder pb = new ProcessBuilder(
                 "spark-submit",
                 "--class", "MainExportApi",
-                "--master", "local[*]",
+                "--master", "local[*]", "--packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.1.1",
+                "F:\\Master2\\Memoire\\personnalisation\\target\\out\\jvm\\scala-2.13.17\\api-spark-scala\\api-spark-scala_2.13-1.0.jar"
+            );*/
+            ProcessBuilder pb = new ProcessBuilder(
+                "spark-submit",
+                "--class", "MainStreamingPersonalization",
+                "--master", "local[*]", "--packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.1.1",
                 "F:\\Master2\\Memoire\\personnalisation\\target\\out\\jvm\\scala-2.13.17\\api-spark-scala\\api-spark-scala_2.13-1.0.jar"
             );
 
