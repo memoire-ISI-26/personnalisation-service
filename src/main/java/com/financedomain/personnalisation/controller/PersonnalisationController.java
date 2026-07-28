@@ -62,4 +62,32 @@ public class PersonnalisationController {
                     .body("Profil d'usage introuvable pour le client " + msisdn + " : " + e.getMessage());
         }
     }
+
+    @GetMapping("/default-services")
+    public ResponseEntity<?> getDefaultServices() {
+        try {
+            return ResponseEntity.ok(new ApiResponse<>(personnalisationService.getDefaultServices(), getPort()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de la récupération des services par défaut : " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/default-services")
+    public ResponseEntity<?> saveDefaultServices(
+            @RequestBody java.util.List<com.financedomain.personnalisation.dto.DefaultServicesDto> dtos,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        
+        if (xUserRole == null || !"ADMINISTRATOR".equals(xUserRole)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Accès refusé : rôle administrateur requis.");
+        }
+
+        try {
+            personnalisationService.saveDefaultServices(dtos);
+            return ResponseEntity.ok(new ApiResponse<>("Configuration enregistrée avec succès.", getPort()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de l'enregistrement de la configuration : " + e.getMessage());
+        }
+    }
 }
