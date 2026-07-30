@@ -4,14 +4,15 @@ import com.financedomain.personnalisation.dto.DefaultServicesDto;
 import com.financedomain.personnalisation.model.DefaultServiceConfig;
 import com.financedomain.personnalisation.proxy.PythonPersonalizationProxy;
 import com.financedomain.personnalisation.repository.DefaultServiceConfigRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class PersonnalisationService {
 
@@ -31,15 +32,13 @@ public class PersonnalisationService {
     @Autowired
     private DefaultServiceConfigRepository configRepository;
     
-    @Cacheable(value = "personalisationUsages", key = "#msisdn")
     public Object getClientUsages(String msisdn) {
-        System.out.println("====== [Personnalisation Cache Miss] Calling HDFS Python API for MSISDN: " + msisdn + " ======");
+        log.info("====== Calling HDFS Python API for MSISDN: {} ======", msisdn);
         return pythonProxy.getClientUsages(msisdn);
     }
 
-    @Cacheable(value = "personalisationGlobalStats")
     public Object getGlobalStats() {
-        System.out.println("====== [Personnalisation Global Cache Miss] Calling HDFS Python API for Global Stats ======");
+        log.info("====== Calling HDFS Python API for Global Stats ======");
         return pythonProxy.getGlobalStats();
     }
 
@@ -47,7 +46,7 @@ public class PersonnalisationService {
         List<DefaultServicesDto> result = new ArrayList<>();
         
         // TELCO
-        Optional<DefaultServiceConfig> telcoOpt = configRepository.findByUniverse("TELCO");
+        Optional<DefaultServiceConfig> telcoOpt = configRepository.findByUniverse(TELCO);
         if (telcoOpt.isPresent()) {
             DefaultServiceConfig config = telcoOpt.get();
             result.add(new DefaultServicesDto(

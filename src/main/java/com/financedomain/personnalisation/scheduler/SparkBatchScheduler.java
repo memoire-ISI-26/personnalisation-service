@@ -1,5 +1,6 @@
 package com.financedomain.personnalisation.scheduler;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
+@Slf4j
 @Component
 @ConditionalOnProperty(name = "spark.batch.enabled", havingValue = "true")
 public class SparkBatchScheduler {
@@ -16,7 +18,7 @@ public class SparkBatchScheduler {
     @Scheduled(cron = "${spark.batch.cron:0 0 */2 * * *}")
     public void runSparkBatchJob() {
 
-        System.out.println("[SCHEDULER] Déclenchement automatique du Job Spark Batch...");
+        log.info("[SCHEDULER] Déclenchement automatique du Job Spark Batch...");
 
         try {
             // Commande spark-submit
@@ -37,24 +39,24 @@ public class SparkBatchScheduler {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    System.out.println("[SPARK-BATCH] " + line);
+                    log.info("[SPARK-BATCH] {}", line);
                 }
             }
 
             // Attente de la fin du processus
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                System.out.println("[SCHEDULER] Job Spark Batch exécuté avec succès (exit code: 0).");
+                log.info("[SCHEDULER] Job Spark Batch exécuté avec succès (exit code: 0).");
             } else {
-                System.err.println("[SCHEDULER] Le Job Spark Batch a échoué avec le code de sortie : " + exitCode);
+                log.error("[SCHEDULER] Le Job Spark Batch a échoué avec le code de sortie : {}", exitCode);
             }
 
         } catch (IOException e) {
-            System.err.println("[SCHEDULER] Erreur E/S lors de l'exécution de spark-submit : " + e.getMessage());
+            log.error("[SCHEDULER] Erreur E/S lors de l'exécution de spark-submit : {}", e.getMessage(), e);
         } catch (InterruptedException e) {
-            System.err.println("[SCHEDULER] L'exécution du Job Spark Batch a été interrompue : " + e.getMessage());
+            log.error("[SCHEDULER] L'exécution du Job Spark Batch a été interrompue : {}", e.getMessage(), e);
             Thread.currentThread().interrupt();
         }
-        System.out.println("==================================================");
+        log.info("==================================================");
     }
 }
