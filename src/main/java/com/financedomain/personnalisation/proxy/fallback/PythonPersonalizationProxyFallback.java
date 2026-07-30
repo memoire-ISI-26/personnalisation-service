@@ -13,4 +13,10 @@ public class PythonPersonalizationProxyFallback implements PythonPersonalization
 
         return new ArrayList<>();
     }
+
+    @Override
+    public Object getGlobalStats() {
+        System.err.println("[Fallback] L'API Python de personnalisation est indisponible pour les statistiques globales.");
+        return new java.util.HashMap<>();
+    }
 }

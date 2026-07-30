@@ -15,6 +15,16 @@ import java.util.Optional;
 @Service
 public class PersonnalisationService {
 
+    private static final String TELCO = "TELCO";
+    private static final String APPEL = "TELCO.SERVICES.PASS.VOICE";
+    private static final String INTERNET = "TELCO.SERVICES.PASS.DATA";
+    private static final String ILLIMIX = "TELCO.SERVICES.PASS.ILLIMIX";
+    private static final String ILLIFLEX = "TELCO.SERVICES.PASS.ILLIFLEX";
+    private static final String TRANSFERT = "OMY.SERVICES.TRANSFERT";
+    private static final String RETRAIT = "OMY.SERVICES.RETRAIT";
+    private static final String VOCAL = "OMY.SERVICES.VOICEBUNDLE";
+
+
     @Autowired
     private PythonPersonalizationProxy pythonProxy;
 
@@ -27,6 +37,12 @@ public class PersonnalisationService {
         return pythonProxy.getClientUsages(msisdn);
     }
 
+    @Cacheable(value = "personalisationGlobalStats")
+    public Object getGlobalStats() {
+        System.out.println("====== [Personnalisation Global Cache Miss] Calling HDFS Python API for Global Stats ======");
+        return pythonProxy.getGlobalStats();
+    }
+
     public List<DefaultServicesDto> getDefaultServices() {
         List<DefaultServicesDto> result = new ArrayList<>();
         
@@ -35,25 +51,25 @@ public class PersonnalisationService {
         if (telcoOpt.isPresent()) {
             DefaultServiceConfig config = telcoOpt.get();
             result.add(new DefaultServicesDto(
-                "TELCO", 
+                TELCO,
                 config.getServiceId1(), 
                 config.getServiceId2(),
-                config.getAdvServiceId1() != null ? config.getAdvServiceId1() : "TELCO.SERVICES.PASS.VOICE",
-                config.getAdvServiceId2() != null ? config.getAdvServiceId2() : "TELCO.SERVICES.PASS.DATA",
-                config.getAdvServiceId3() != null ? config.getAdvServiceId3() : "TELCO.SERVICES.PASS.ILLIMIX",
-                config.getAdvServiceId4() != null ? config.getAdvServiceId4() : "TELCO.SERVICES.PASS.ILLIFLEX",
-                config.getAdvServiceId5() != null ? config.getAdvServiceId5() : "TELCO.SERVICES.PASS.VOICE"
+                config.getAdvServiceId1() != null ? config.getAdvServiceId1() : APPEL,
+                config.getAdvServiceId2() != null ? config.getAdvServiceId2() : INTERNET,
+                config.getAdvServiceId3() != null ? config.getAdvServiceId3() : ILLIMIX,
+                config.getAdvServiceId4() != null ? config.getAdvServiceId4() : ILLIFLEX,
+                config.getAdvServiceId5() != null ? config.getAdvServiceId5() : APPEL
             ));
         } else {
             result.add(new DefaultServicesDto(
-                "TELCO", 
-                "TELCO.SERVICES.PASS.VOICE", 
-                "TELCO.SERVICES.PASS.DATA",
-                "TELCO.SERVICES.PASS.VOICE",
-                "TELCO.SERVICES.PASS.DATA",
-                "TELCO.SERVICES.PASS.ILLIMIX",
-                "TELCO.SERVICES.PASS.ILLIFLEX",
-                "TELCO.SERVICES.PASS.VOICE"
+                TELCO,
+                APPEL,
+                INTERNET,
+                APPEL,
+                INTERNET,
+                ILLIMIX,
+                ILLIFLEX,
+                APPEL
             ));
         }
 
@@ -65,21 +81,21 @@ public class PersonnalisationService {
                 "OMY", 
                 config.getServiceId1(), 
                 config.getServiceId2(),
-                config.getAdvServiceId1() != null ? config.getAdvServiceId1() : "OMY.SERVICES.TRANSFERT",
-                config.getAdvServiceId2() != null ? config.getAdvServiceId2() : "OMY.SERVICES.VOICEBUNDLE",
+                config.getAdvServiceId1() != null ? config.getAdvServiceId1() : TRANSFERT,
+                config.getAdvServiceId2() != null ? config.getAdvServiceId2() : VOCAL,
                 config.getAdvServiceId3() != null ? config.getAdvServiceId3() : "DEPOT",
-                config.getAdvServiceId4() != null ? config.getAdvServiceId4() : "OMY.SERVICES.RETRAIT",
+                config.getAdvServiceId4() != null ? config.getAdvServiceId4() : RETRAIT,
                 config.getAdvServiceId5() != null ? config.getAdvServiceId5() : "RAPIDO"
             ));
         } else {
             result.add(new DefaultServicesDto(
                 "OMY", 
-                "OMY.SERVICES.TRANSFERT", 
-                "OMY.SERVICES.VOICEBUNDLE",
-                "OMY.SERVICES.TRANSFERT",
-                "OMY.SERVICES.VOICEBUNDLE",
+                TRANSFERT,
+                VOCAL,
+                TRANSFERT,
+                VOCAL,
                 "DEPOT",
-                "OMY.SERVICES.RETRAIT",
+                RETRAIT,
                 "RAPIDO"
             ));
         }

@@ -38,6 +38,21 @@ public class PersonnalisationController {
         }
     }
 
+    @GetMapping("/usages/stats/global")
+    public ResponseEntity<?> getGlobalStats(
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        if (xUserRole == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+        try {
+            Object stats = personnalisationService.getGlobalStats();
+            return ResponseEntity.ok(new ApiResponse<>(stats, getPort()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de la récupération des stats globales HDFS : " + e.getMessage());
+        }
+    }
+
     @GetMapping("/usages/{msisdn}")
     public ResponseEntity<?> getUsagesByMsisdn(
             @PathVariable String msisdn,

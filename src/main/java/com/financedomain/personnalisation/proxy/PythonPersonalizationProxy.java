@@ -10,4 +10,7 @@ public interface PythonPersonalizationProxy {
 
     @GetMapping("/api/v1/usages/{msisdn}")
     Object getClientUsages(@PathVariable("msisdn") String msisdn);
+
+    @GetMapping("/api/v1/usages/stats/global")
+    Object getGlobalStats();
 }
