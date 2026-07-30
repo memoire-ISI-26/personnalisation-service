@@ -18,10 +18,10 @@ import lombok.*;
 public class ApiResponse<T> {
 
     private T data;
-    private String execution_chain;
+    private String executionChain;
 
     public ApiResponse(T data, String port) {
         this.data = data;
-        this.execution_chain = "personnalisation-service:" + port;
+        this.executionChain = "personnalisation-service:" + port;
     }
 }
