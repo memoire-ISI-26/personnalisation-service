@@ -3,28 +3,23 @@ package com.financedomain.personnalisation.scheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
 @Component
+@ConditionalOnProperty(name = "spark.batch.enabled", havingValue = "true")
 public class SparkBatchScheduler {
 
     // S'exécute par défaut toutes les 2 heures (configurable dans les properties via spark.batch.cron)
     @Scheduled(cron = "${spark.batch.cron:0 0 */2 * * *}")
     public void runSparkBatchJob() {
-        System.out.println("==================================================");
+
         System.out.println("[SCHEDULER] Déclenchement automatique du Job Spark Batch...");
-        System.out.println("==================================================");
 
         try {
             // Commande spark-submit
-            /*ProcessBuilder pb = new ProcessBuilder(
-                "spark-submit",
-                "--class", "MainExportApi",
-                "--master", "local[*]", "--packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.1.1",
-                "F:\\Master2\\Memoire\\personnalisation\\target\\out\\jvm\\scala-2.13.17\\api-spark-scala\\api-spark-scala_2.13-1.0.jar"
-            );*/
             ProcessBuilder pb = new ProcessBuilder(
                 "spark-submit",
                 "--class", "MainStreamingPersonalization",
