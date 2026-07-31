@@ -44,62 +44,53 @@ public class PersonnalisationService {
 
     public List<DefaultServicesDto> getDefaultServices() {
         List<DefaultServicesDto> result = new ArrayList<>();
-        
-        // TELCO
+        result.add(buildTelcoDto());
+        result.add(buildOmyDto());
+        return result;
+    }
+
+    private DefaultServicesDto buildTelcoDto() {
         Optional<DefaultServiceConfig> telcoOpt = configRepository.findByUniverse(TELCO);
         if (telcoOpt.isPresent()) {
             DefaultServiceConfig config = telcoOpt.get();
-            result.add(new DefaultServicesDto(
+            return new DefaultServicesDto(
                 TELCO,
                 config.getServiceId1(), 
                 config.getServiceId2(),
-                config.getAdvServiceId1() != null ? config.getAdvServiceId1() : APPEL,
-                config.getAdvServiceId2() != null ? config.getAdvServiceId2() : INTERNET,
-                config.getAdvServiceId3() != null ? config.getAdvServiceId3() : ILLIMIX,
-                config.getAdvServiceId4() != null ? config.getAdvServiceId4() : ILLIFLEX,
-                config.getAdvServiceId5() != null ? config.getAdvServiceId5() : APPEL
-            ));
-        } else {
-            result.add(new DefaultServicesDto(
-                TELCO,
-                APPEL,
-                INTERNET,
-                APPEL,
-                INTERNET,
-                ILLIMIX,
-                ILLIFLEX,
-                APPEL
-            ));
+                getOrDefault(config.getAdvServiceId1(), APPEL),
+                getOrDefault(config.getAdvServiceId2(), INTERNET),
+                getOrDefault(config.getAdvServiceId3(), ILLIMIX),
+                getOrDefault(config.getAdvServiceId4(), ILLIFLEX),
+                getOrDefault(config.getAdvServiceId5(), APPEL)
+            );
         }
+        return new DefaultServicesDto(
+            TELCO, APPEL, INTERNET, APPEL, INTERNET, ILLIMIX, ILLIFLEX, APPEL
+        );
+    }
 
-        // OMY
+    private DefaultServicesDto buildOmyDto() {
         Optional<DefaultServiceConfig> omyOpt = configRepository.findByUniverse("OMY");
         if (omyOpt.isPresent()) {
             DefaultServiceConfig config = omyOpt.get();
-            result.add(new DefaultServicesDto(
+            return new DefaultServicesDto(
                 "OMY", 
                 config.getServiceId1(), 
                 config.getServiceId2(),
-                config.getAdvServiceId1() != null ? config.getAdvServiceId1() : TRANSFERT,
-                config.getAdvServiceId2() != null ? config.getAdvServiceId2() : VOCAL,
-                config.getAdvServiceId3() != null ? config.getAdvServiceId3() : "DEPOT",
-                config.getAdvServiceId4() != null ? config.getAdvServiceId4() : RETRAIT,
-                config.getAdvServiceId5() != null ? config.getAdvServiceId5() : "RAPIDO"
-            ));
-        } else {
-            result.add(new DefaultServicesDto(
-                "OMY", 
-                TRANSFERT,
-                VOCAL,
-                TRANSFERT,
-                VOCAL,
-                "DEPOT",
-                RETRAIT,
-                "RAPIDO"
-            ));
+                getOrDefault(config.getAdvServiceId1(), TRANSFERT),
+                getOrDefault(config.getAdvServiceId2(), VOCAL),
+                getOrDefault(config.getAdvServiceId3(), "DEPOT"),
+                getOrDefault(config.getAdvServiceId4(), RETRAIT),
+                getOrDefault(config.getAdvServiceId5(), "RAPIDO")
+            );
         }
+        return new DefaultServicesDto(
+            "OMY", TRANSFERT, VOCAL, TRANSFERT, VOCAL, "DEPOT", RETRAIT, "RAPIDO"
+        );
+    }
 
-        return result;
+    private String getOrDefault(String value, String defaultValue) {
+        return value != null ? value : defaultValue;
     }
 
     public void saveDefaultServices(List<DefaultServicesDto> dtos) {
