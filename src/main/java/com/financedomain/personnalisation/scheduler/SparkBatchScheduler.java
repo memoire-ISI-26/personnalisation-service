@@ -1,6 +1,7 @@
 package com.financedomain.personnalisation.scheduler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,19 +15,26 @@ import java.io.IOException;
 @ConditionalOnProperty(name = "spark.batch.enabled", havingValue = "true")
 public class SparkBatchScheduler {
 
+    @Value("${spark.submit.path:spark-submit}")
+    private String sparkSubmitExecutable;
+
+    @Value("${spark.jar.path:F:\\Master2\\Memoire\\personnalisation\\target\\out\\jvm\\scala-2.13.17\\api-spark-scala\\api-spark-scala_2.13-1.0.jar}")
+    private String sparkJarPath;
+
     // S'exécute par défaut toutes les 2 heures (configurable dans les properties via spark.batch.cron)
     @Scheduled(cron = "${spark.batch.cron:0 0 */2 * * *}")
     public void runSparkBatchJob() {
 
-        log.info("[SCHEDULER] Déclenchement automatique du Job Spark Batch...");
+        log.info("[SCHEDULER] Déclenchement automatique du Job Spark Batch avec l'exécutable: {}", sparkSubmitExecutable);
 
         try {
-            // Commande spark-submit
+            // Commande spark-submit sécurisée et configurable
             ProcessBuilder pb = new ProcessBuilder(
-                "spark-submit",
+                sparkSubmitExecutable,
                 "--class", "MainStreamingPersonalization",
-                "--master", "local[*]", "--packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.1.1",
-                "F:\\Master2\\Memoire\\personnalisation\\target\\out\\jvm\\scala-2.13.17\\api-spark-scala\\api-spark-scala_2.13-1.0.jar"
+                "--master", "local[*]",
+                "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.13:4.1.1",
+                sparkJarPath
             );
 
             // Rediriger le flux d'erreur standard vers le flux d'entrée standard
