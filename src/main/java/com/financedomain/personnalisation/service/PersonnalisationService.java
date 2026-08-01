@@ -5,7 +5,6 @@ import com.financedomain.personnalisation.model.DefaultServiceConfig;
 import com.financedomain.personnalisation.proxy.PythonPersonalizationProxy;
 import com.financedomain.personnalisation.repository.DefaultServiceConfigRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,12 +25,15 @@ public class PersonnalisationService {
     private static final String VOCAL = "OMY.SERVICES.VOICEBUNDLE";
 
 
-    @Autowired
-    private PythonPersonalizationProxy pythonProxy;
+    private final PythonPersonalizationProxy pythonProxy;
 
-    @Autowired
-    private DefaultServiceConfigRepository configRepository;
-    
+    private final DefaultServiceConfigRepository configRepository;
+
+    public PersonnalisationService(PythonPersonalizationProxy pythonProxy, DefaultServiceConfigRepository configRepository) {
+        this.pythonProxy = pythonProxy;
+        this.configRepository = configRepository;
+    }
+
     public Object getClientUsages(String msisdn) {
         log.info("====== Calling HDFS Python API for MSISDN: {} ======", msisdn);
         return pythonProxy.getClientUsages(msisdn);

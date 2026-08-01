@@ -2,7 +2,7 @@ package com.financedomain.personnalisation.controller;
 
 import com.financedomain.personnalisation.dto.ApiResponse;
 import com.financedomain.personnalisation.service.PersonnalisationService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,18 +12,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/personnalisation")
 public class PersonnalisationController {
 
-    @Autowired
-    private PersonnalisationService personnalisationService;
+    private final PersonnalisationService personnalisationService;
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
+
+    public PersonnalisationController(PersonnalisationService personnalisationService, Environment environment) {
+        this.personnalisationService = personnalisationService;
+        this.environment = environment;
+    }
 
     private String getPort() {
         return environment.getProperty("local.server.port", "unknown");
     }
 
     @GetMapping("/usages")
-    public ResponseEntity<?> getMyUsages(
+    public ResponseEntity<Object> getMyUsages(
             @RequestHeader(value = "X-User-Phone", required = false) String msisdn) {
         if (msisdn == null || msisdn.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -39,7 +42,7 @@ public class PersonnalisationController {
     }
 
     @GetMapping("/usages/stats/global")
-    public ResponseEntity<?> getGlobalStats(
+    public ResponseEntity<Object> getGlobalStats(
             @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
         if (xUserRole == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -54,7 +57,7 @@ public class PersonnalisationController {
     }
 
     @GetMapping("/usages/{msisdn}")
-    public ResponseEntity<?> getUsagesByMsisdn(
+    public ResponseEntity<Object> getUsagesByMsisdn(
             @PathVariable String msisdn,
             @RequestHeader(value = "X-User-Phone", required = false) String xUserPhone,
             @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
@@ -79,7 +82,7 @@ public class PersonnalisationController {
     }
 
     @GetMapping("/default-services")
-    public ResponseEntity<?> getDefaultServices() {
+    public ResponseEntity<Object> getDefaultServices() {
         try {
             return ResponseEntity.ok(new ApiResponse<>(personnalisationService.getDefaultServices(), getPort()));
         } catch (Exception e) {
@@ -89,7 +92,7 @@ public class PersonnalisationController {
     }
 
     @PostMapping("/default-services")
-    public ResponseEntity<?> saveDefaultServices(
+    public ResponseEntity<Object> saveDefaultServices(
             @RequestBody java.util.List<com.financedomain.personnalisation.dto.DefaultServicesDto> dtos,
             @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
         
